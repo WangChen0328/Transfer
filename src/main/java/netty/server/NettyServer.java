@@ -12,6 +12,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import netty.NettyConstant;
 import netty.codec.marshalling.decode.NettyMessageDecoder;
 import netty.codec.marshalling.encode.NettyMessageEncoder;
+import netty.frame.JProgressBarPanel;
 
 /**
  * @author wangchen
@@ -20,10 +21,10 @@ import netty.codec.marshalling.encode.NettyMessageEncoder;
 public class NettyServer {
 
     public void run() throws Exception {
-        this.run(NettyConstant.REMOTE_IP, NettyConstant.LOCAL_PORT, new NioEventLoopGroup(), new NioEventLoopGroup());
+        this.run(NettyConstant.REMOTE_IP, NettyConstant.LOCAL_PORT, new NioEventLoopGroup(), new NioEventLoopGroup(), new String[]{});
     }
 
-    public void run(String host, int port, NioEventLoopGroup bossGroup, NioEventLoopGroup workGroup) throws Exception {
+    public void run(String host, int port, NioEventLoopGroup bossGroup, NioEventLoopGroup workGroup, String[] whiteList) throws Exception {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workGroup)
@@ -48,15 +49,15 @@ public class NettyServer {
                                     /**
                                      * 50秒内没有读取到对方任何信息，需要主动关闭链路
                                      */
-                                    //.addLast("readTimeoutHandler", new ReadTimeoutHandler(5000))
+                                    .addLast("readTimeoutHandler", new ReadTimeoutHandler(5000))
                                     /**
                                      * 握手
                                      */
-                                    //.addLast("loginAuthHandler", new LoginAuthRespHandler())
+                                    .addLast("loginAuthHandler", new LoginAuthRespHandler(whiteList))
                                     /**
                                      * 心跳
                                      */
-                                    //.addLast("heartBeatHandler", new HeartBeatRespHandler())
+                                    .addLast("heartBeatHandler", new HeartBeatRespHandler())
                                     /**
                                      * 文件接收
                                      */

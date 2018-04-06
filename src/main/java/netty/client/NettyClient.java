@@ -63,15 +63,15 @@ public class NettyClient {
                                     /**
                                      * 50秒内没有读取到对方任何信息，需要主动关闭链路
                                      */
-                                    //.addLast("readTimeoutHandler", new ReadTimeoutHandler(50))
+                                    .addLast("readTimeoutHandler", new ReadTimeoutHandler(50))
                                     /**
                                      * 握手
                                      */
-                                    //.addLast("loginAuthHandler", new LoginAuthReqHandler())
+                                    .addLast("loginAuthHandler", new LoginAuthReqHandler())
                                     /**
                                      * 心跳
                                      */
-                                    //.addLast("heartBeatHandler", new HeartBeatReqHandler())
+                                    .addLast("heartBeatHandler", new HeartBeatReqHandler())
                                     /**
                                      * 传输文件
                                      */

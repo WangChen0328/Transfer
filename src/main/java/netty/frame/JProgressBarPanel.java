@@ -87,34 +87,86 @@ public class JProgressBarPanel extends JFrame {
                 accept.setVisible(false);
                 transfer.setVisible(false);
 
+                JPanel panel = new JPanel();
+                panel.setLayout(new GridLayout(3,1,20,0));
+                frame.add(panel);
+
                 JTextField jTextField = null;
                 try {
                     jTextField = new JTextField("监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_PORT );
-                    frame.add(jTextField);
+                    panel.add(jTextField);
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 }
+
+                /**
+                 * 白名单地址
+                 */
+                JTextArea area = new JTextArea("谁可以访问你? 输入IP,逗号隔开！ 默认 127.0.0.1", 5, 5);
+                panel.add(area);
+
+                area.setTabSize(4);
+                area.setFont(new Font("标楷体", Font.BOLD, 16));
+                area.setLineWrap(true);// 激活自动换行功能
+                area.setWrapStyleWord(true);// 激活断行不断字功能
+                area.setBackground(Color.LIGHT_GRAY);
+
 
                 jTextField.setBorder(new EmptyBorder(0,0,0,0));
                 jTextField.setBackground(new Color(238, 238, 238));
                 jTextField.setFont(new Font("宋体",Font.BOLD,20));
 
+                JButton run = new JButton("启动");
+                run.setFont(new Font("宋体",Font.BOLD,20));
+
+                run.setSize(10,10);
+                panel.add(run);
+
                 /**
-                 * 调用Netty Server
+                 * 开启Netty监听
                  */
-                thread = new Thread(new Runnable() {
+                run.addActionListener(new AbstractAction() {
                     @Override
-                    public void run() {
-                        try {
-                            bossGroup = new NioEventLoopGroup();
-                            workGroup = new NioEventLoopGroup();
-                            new NettyServer().run(InetAddress.getLocalHost().getHostAddress(), NettyConstant.LOCAL_PORT, bossGroup, workGroup);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                    public void actionPerformed(ActionEvent e) {
+
+                        boolean matches = true;
+
+                        String text = area.getText();
+
+                        if (text.length() == 0) {
+                            matches = false;
+                        } else {
+                            String[] regexs = text.split(",");
+                            for (String regex : regexs) {
+                                boolean matches1 = regex.matches("((25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))");
+                                if (!matches1) {
+                                    matches = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (matches) {
+                            thread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        bossGroup = new NioEventLoopGroup();
+                                        workGroup = new NioEventLoopGroup();
+                                        new NettyServer().run(InetAddress.getLocalHost().getHostAddress(), NettyConstant.LOCAL_PORT, bossGroup, workGroup, area.getText().split(","));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            thread.start();
+                            run.setText("已启动！");
+                        } else {
+                            run.setVisible(true);
+                            area.setText("ip地址格式不合法！");
                         }
                     }
                 });
-                thread.start();
             }
         });
         /**

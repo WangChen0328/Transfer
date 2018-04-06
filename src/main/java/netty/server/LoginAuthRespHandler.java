@@ -27,7 +27,13 @@ public class LoginAuthRespHandler extends ChannelHandlerAdapter {
     /**
      * 白名单
      */
-    private String[] whiteList = new String[]{"127.0.0.1", "192.168.1.142"};
+    private String[] whiteList = new String[]{"127.0.0.1"};
+
+    public LoginAuthRespHandler(String[] whiteList) {
+        if (whiteList != null && whiteList.length > 0) {
+            this.whiteList = whiteList;
+        }
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
