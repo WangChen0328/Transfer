@@ -161,6 +161,7 @@ public class JProgressBarPanel extends JFrame {
                             });
                             thread.start();
                             run.setText("已启动！");
+                            run.setEnabled(false);
                         } else {
                             run.setVisible(true);
                             area.setText("ip地址格式不合法！");
