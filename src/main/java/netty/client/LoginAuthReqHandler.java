@@ -36,6 +36,7 @@ public class LoginAuthReqHandler extends ChannelHandlerAdapter {
              * 约定如果捂手成功为0 否则失败 关闭链路
              */
             if (loginResult != (byte) 0) {
+                log.info("握手失败,没有权限,未被列入可以访问的名单！");
                 ctx.close();
             }
             log.info("客户端收到，服务端应答。三次握手完成：" + new Date().toString());

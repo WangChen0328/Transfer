@@ -187,7 +187,7 @@ public class JProgressBarPanel extends JFrame {
                  * 上传按钮
                  */
                 JButton developer = new JButton("上传文件");
-                JTextField field = new JTextField("输入远程连接地址");
+                JTextField field = new JTextField("输入,监听地址");
                 field.setSize(220, 20);
                 field.setFont(new Font("宋体",Font.BOLD,20));
 
