@@ -29,7 +29,9 @@ public class FileUploadReqHandler extends SimpleChannelInboundHandler<NettyMessa
 
     private static final Logger log = LoggerFactory.getLogger(FileUploadReqHandler.class);
 
-    JProgressBarPanel panel;
+    private JProgressBarPanel panel;
+
+    private int MAX_SIZE = 5000 * 1024;
 
     private Map<String, RequestFile> requests;
 
@@ -133,10 +135,10 @@ public class FileUploadReqHandler extends SimpleChannelInboundHandler<NettyMessa
         /**
          * 计算剩余量
          */
-        if (capacity < 8192) {
+        if (capacity < MAX_SIZE) {
             bytes = new byte[capacity];
         } else {
-            bytes = new byte[8192];
+            bytes = new byte[MAX_SIZE];
         }
 
         int readByteSize = 0;

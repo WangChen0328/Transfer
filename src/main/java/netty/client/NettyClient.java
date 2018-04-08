@@ -55,7 +55,7 @@ public class NettyClient {
                                     /**
                                      * 解码
                                      */
-                                    .addLast(new NettyMessageDecoder(1024 * 1024, 4,4))
+                                    .addLast(new NettyMessageDecoder(10000 * 1024, 4,4))
                                     /**
                                      * 编码
                                      */

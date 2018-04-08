@@ -41,7 +41,7 @@ public class NettyServer {
                                     /**
                                      * 解码
                                      */
-                                    .addLast(new NettyMessageDecoder(1024 * 1024, 4,4))
+                                    .addLast(new NettyMessageDecoder(10000 * 1024, 4,4))
                                     /**
                                      * 编码
                                      */
@@ -49,7 +49,7 @@ public class NettyServer {
                                     /**
                                      * 50秒内没有读取到对方任何信息，需要主动关闭链路
                                      */
-                                    .addLast("readTimeoutHandler", new ReadTimeoutHandler(5000))
+                                    .addLast("readTimeoutHandler", new ReadTimeoutHandler(50))
                                     /**
                                      * 握手
                                      */
