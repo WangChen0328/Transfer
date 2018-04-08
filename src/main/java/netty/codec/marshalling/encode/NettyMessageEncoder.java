@@ -76,6 +76,9 @@ public class NettyMessageEncoder extends MessageToByteEncoder<NettyMessage> {
         } else {
             sendBuf.writeInt(0);
         }
+        /**
+         * 这里设定了 解码时的 偏移点和偏移长度
+         */
         sendBuf.setInt(4, sendBuf.readableBytes() - 8);
     }
 }
