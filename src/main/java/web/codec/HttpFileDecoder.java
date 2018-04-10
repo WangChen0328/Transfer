@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
  */
 public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
 
+    Pattern pattern = Pattern.compile("Content-Disposition:form-data;name=\"([a-z]+?)\"(.+)");
+
     @Override
     protected void decode(ChannelHandlerContext ctx, FullHttpRequest request, List<Object> out) throws Exception {
 
@@ -38,51 +40,44 @@ public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
 
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
-
+        /**
+         * 不支持Get请求
+         */
         else if (request.getMethod() == HttpMethod.GET) {
             HeaderUtil.sendError(ctx, HttpResponseStatus.FORBIDDEN);
         }
-
+        /**
+         * POST
+         */
         else if (request.getMethod() == HttpMethod.POST) {
-
-            String s1 = request.headers().get(HttpHeaders.Names.CONTENT_TYPE);
-
-            String[] split = s1.split("----");
-
-            String regex = split[1];
-
+            /**
+             * 分隔符
+             */
+            String regex = request.headers().get(HttpHeaders.Names.CONTENT_TYPE).split("----")[1];
+            /**
+             * 获得文件属性
+             */
             ByteBuf content = request.content();
-
-            int readableBytes = content.readableBytes();
-
-            byte[] bytes = new byte[readableBytes];
-
+            byte[] bytes = new byte[content.readableBytes()];
             content.readBytes(bytes);
-
-            String s = new String(bytes, "UTF-8");
-
-            String[] split1 = s.split("------" + regex);
-
-            Pattern pattern = Pattern.compile("Content-Disposition:form-data;name=\"([a-z]+)\"(.+)");
-
+            String[] attrs  = new String(bytes, "UTF-8").split("------" + regex);
+            /**
+             * 文件
+             */
             WebUploader webUploader = new WebUploader();
-
-            Class<? extends WebUploader> uploaderClass = webUploader.getClass();
-
-            for (String str : split1) {
-
-                str = RegexUtil.StringFilter(str);
-
-                Matcher matcher = pattern.matcher(str);
+            /**
+             * 实例属性
+             */
+            for (String attr : attrs) {
+                attr = RegexUtil.StringFilter(attr);
+                Matcher matcher = pattern.matcher(attr);
                 if (matcher.find()) {
-
-                    String name = matcher.group(1);
-                    String value = matcher.group(2);
-
-                    ReflectionUtil.setField(webUploader, name, value);
+                    ReflectionUtil.setFieldValue(webUploader, matcher.group(1), matcher.group(2));
                 }
             }
-
+            /**
+             * call next
+             */
             out.add(webUploader);
         }
     }

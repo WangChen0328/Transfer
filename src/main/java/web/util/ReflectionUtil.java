@@ -5,6 +5,8 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * @author wangchen
@@ -22,12 +24,39 @@ public class ReflectionUtil {
      * @param value
      *            修改后的新值
      */
-    public static void setField(Object obj, String name,Object value)
-            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    public static void setFieldValue(Object obj, String name,Object value)
+            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ParseException {
         Field field = obj.getClass().getDeclaredField(name);
 
         field.setAccessible(true);
-        field.set(obj, value);
+        field.set(obj, formatValue(field, value));
+    }
+
+    /**
+     * 根据字段属性，来转换值的类型
+     *
+     * @param field
+     *             字段
+     * @param value
+     *             值
+     * @return
+     */
+    public static Object formatValue(Field field, Object value) throws ParseException {
+
+        if (value instanceof java.lang.String) {
+            value = String.valueOf(value);
+        }
+        else if (value instanceof java.lang.Integer) {
+            value = Integer.parseInt(String.valueOf(value));
+        }
+        else if (value instanceof java.lang.Long) {
+            value = Long.parseLong(String.valueOf(value));
+        }
+        else if (value instanceof java.util.Date) {
+            new SimpleDateFormat().parse(String.valueOf(value));
+        }
+
+        return value;
     }
 
     /**

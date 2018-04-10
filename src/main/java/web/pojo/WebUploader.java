@@ -24,6 +24,10 @@ public class WebUploader {
      */
     private Date lastModifiedDate;
     /**
+     * 片段长度
+     */
+    private long size;
+    /**
      * 总分片数
      */
     private int chunks;
@@ -62,6 +66,14 @@ public class WebUploader {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
     }
 
     public int getChunks() {
