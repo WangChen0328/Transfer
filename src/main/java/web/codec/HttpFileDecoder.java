@@ -1,6 +1,5 @@
 package web.codec;
 
-import com.sun.deploy.util.StringUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,10 +10,8 @@ import web.pojo.WebUploader;
 import web.util.HeaderUtil;
 import web.util.ReflectionUtil;
 import web.util.RegexUtil;
-import web.util.StringUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,34 +49,35 @@ public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
          */
         else if (request.getMethod() == HttpMethod.POST) {
             /**
-             * 分隔符
+             * URL
              */
-            String regex = request.headers().get(HttpHeaders.Names.CONTENT_TYPE).split("----")[1];
+            String uri = request.getUri();
+            uri = URLDecoder.decode(uri, "UTF-8");
             /**
-             * 获得文件属性
-             */
-            ByteBuf content = request.content();
-            byte[] bytes = new byte[content.readableBytes()];
-            content.readBytes(bytes);
-            String[] attrs  = new String(bytes, "UTF-8").split("------" + regex);
-            /**
-             * 文件属性
+             * head
              */
             WebUploader webUploader = new WebUploader();
             /**
-             * 实例属性
+             * webUploader attr
              */
-            for (String attr : attrs) {
-                attr = RegexUtil.StringFilter(attr);
-                Matcher matcher = pattern.matcher(attr);
-                if (matcher.find()) {
-                    ReflectionUtil.setFieldValue(webUploader, matcher.group(1), matcher.group(2));
-                }
+            for (String attr : uri.split("&")) {
+                String name = attr.split("=")[0];
+                String value = attr.split("=")[1];
+                int index = name.indexOf("?");
+                name = index > 0 ? name.substring(index + 1, name.length()) : name;
+                ReflectionUtil.setFieldValue(webUploader, name, value);
             }
+            /**
+             * body
+             */
+            ByteBuf content = request.content();
+            int readableBytes = content.readableBytes();
+            byte[] bytes = new byte[readableBytes];
+            content.readBytes(bytes);
             /**
              * call next
              */
-            out.add(new NettyMessage(webUploader, null));
+            out.add(new NettyMessage(webUploader, bytes));
         }
     }
 }

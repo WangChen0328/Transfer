@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -23,15 +24,52 @@ public class ReflectionUtil {
      * @param value
      *            修改后的新值
      */
-    public static void setFieldValue(Object obj, String name,String value)
+    public static void setFieldValue(Object obj, String name, String value)
             throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ParseException {
-        if (getFields(obj.getClass()).containsKey(name)) {
 
-            Field field = obj.getClass().getDeclaredField(name);
+        Field field = obj.getClass().getDeclaredField(name);
 
-            field.setAccessible(true);
-            field.set(obj, value);
+        field.setAccessible(true);
+        field.set(obj, formatValue(obj.getClass(), name, value));
+    }
+
+    /**
+     *  修改值的类型
+     *
+     * @param clazz
+     *              类型
+     * @param name
+     *              字段名
+     * @param value
+     *              修改后的新值
+     */
+    public static Object formatValue(Class<?> clazz, String name, String value) throws ParseException {
+        Map<String, EntityClass> fields = getFields(clazz);
+
+        EntityClass entityClass = fields.get(name);
+
+        String typeClass = entityClass.getType().getName();
+
+        /**
+         * Date
+         */
+        if ("java.util.Date".equals(typeClass)) {
+            value = value.replace("GMT", "").replaceAll("\\(.*\\)", "");
+            return new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss z", Locale.ENGLISH).parse(value);
         }
+        /**
+         *  Long
+         */
+        else if ("long".equals(typeClass)){
+            return Long.parseLong(value);
+        }
+        /**
+         *  Integer
+         */
+        else if ("int".equals(typeClass)){
+            return Integer.parseInt(value);
+        }
+        return value;
     }
 
     /**

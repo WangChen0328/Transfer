@@ -14,9 +14,9 @@ public class NettyMessage {
     /**
      * 消息体
      */
-    private Object body;
+    private byte[] body;
 
-    public NettyMessage(WebUploader header, Object body) {
+    public NettyMessage(WebUploader header, byte[] body) {
         this.header = header;
         this.body = body;
     }
@@ -29,11 +29,11 @@ public class NettyMessage {
         this.header = header;
     }
 
-    public Object getBody() {
+    public byte[] getBody() {
         return body;
     }
 
-    public void setBody(Object body) {
+    public void setBody(byte[] body) {
         this.body = body;
     }
 }
