@@ -22,8 +22,6 @@ import java.util.regex.Pattern;
  */
 public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
 
-    Pattern pattern = Pattern.compile("Content-Disposition:form-data;name=\"([a-zA-Z]+?)\"(.+)");
-
     @Override
     protected void decode(ChannelHandlerContext ctx, FullHttpRequest request, List<Object> out) throws Exception {
 
