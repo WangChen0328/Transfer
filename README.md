@@ -9,8 +9,6 @@
 
 JProgressBarPanel为启动类
 
-![image](https://github.com/18920522006/Transfer/blob/master/src/main/resources/image/首页.png)
-
 ![image](https://github.com/18920522006/Transfer/blob/master/src/main/resources/image/发布服务.png)
 
 ![image](https://github.com/18920522006/Transfer/blob/master/src/main/resources/image/上传.png)
@@ -21,11 +19,12 @@ JProgressBarPanel为启动类
 
 加入接收Web页面的传输功能，JS 传输使用 WebUploader发送
 
-以二进制形式发送数据。
+以二进制形式发送数据。传输成功后，返回MD5加密的保存文件路径。
 
 var uploader = WebUploader.create({
-    ..................
     sendAsBinary: true
 });
 
-由于 WebUploader 本身支持 分片发送，MD5校验等。和Netty可以完美配合。
+由于 WebUploader 本身支持 跨域、分片发送、MD5校验等。和Netty可以完美配合。
+
+![image](https://github.com/18920522006/Transfer/blob/master/src/main/resources/image/Web接收.png)
