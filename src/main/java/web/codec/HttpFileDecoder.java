@@ -80,4 +80,9 @@ public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
             out.add(new NettyMessage(webUploader, bytes));
         }
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.fireChannelRead(cause);
+    }
 }
