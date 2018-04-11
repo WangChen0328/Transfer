@@ -23,9 +23,7 @@ import java.util.Date;
  */
 public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<NettyMessage> {
 
-    private String localPath = System.getProperty("user.home");
-
-    private String FileServer = "FileServer";
+    private String localPath = System.getProperty("user.home") + File.separator + "FileServer" + File.separator + "Web";
 
     RandomAccessFile randomAccessFile;
 
@@ -61,7 +59,7 @@ public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<Net
      */
     private String mkdirs(String filePath) {
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        String localFilePath = localPath + File.separator + FileServer + File.separator + date + File.separator + filePath;
+        String localFilePath = localPath  + File.separator + date + File.separator + filePath;
         FileUtil.createMissingParentDirectories(new File(localFilePath));
         return localFilePath;
     }

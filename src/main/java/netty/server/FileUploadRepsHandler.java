@@ -1,5 +1,6 @@
 package netty.server;
 
+import ch.qos.logback.core.util.FileUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.ResourceLeakDetector;
@@ -17,7 +18,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +36,7 @@ public class FileUploadRepsHandler extends SimpleChannelInboundHandler<NettyMess
     /**
      * 文件默认存储地址, 用户当前目录
      */
-    private String file_dir = System.getProperty("user.dir");
+    private String localPath = System.getProperty("user.home") + File.separator + "FileServer" + File.separator + "Netty";
 
     private Map<String, RandomAccessFile> randomAccessFiles;
 
@@ -57,10 +60,13 @@ public class FileUploadRepsHandler extends SimpleChannelInboundHandler<NettyMess
             String fileMd5 = request.getFileMd5();
             String fileName = request.getFileName();
             long fileSize = request.getFileSize();
+
+            String localFilePath = mkdirs(fileMd5 + "_" + fileName);
+
             /**
              * 文件位置
              */
-            File file = new File(file_dir + File.separator + fileName + "_" + fileMd5);
+            File file = new File(localFilePath);
             /**`
              * 返回客户端
              */
@@ -121,7 +127,9 @@ public class FileUploadRepsHandler extends SimpleChannelInboundHandler<NettyMess
             String fileMd5 = request.getFileMd5();
             String fileName = request.getFileName();
 
-            File file = new File(file_dir + File.separator + fileMd5 + "_"+ fileName);
+            String localFilePath = mkdirs(fileMd5 + "_" + fileName);
+
+            File file = new File(localFilePath);
 
             RandomAccessFile randomAccessFile = getAccessFile(file.getPath(), file);
 
@@ -190,5 +198,17 @@ public class FileUploadRepsHandler extends SimpleChannelInboundHandler<NettyMess
             this.randomAccessFiles.put(fileName, accessFile);
             return accessFile;
         }
+    }
+
+    /**
+     * 默认的系统下载目录
+     * @param fileName
+     * @return
+     */
+    private String mkdirs(String fileName) {
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String localFilePath = localPath  + File.separator + date + File.separator + fileName;
+        FileUtil.createMissingParentDirectories(new File(localFilePath));
+        return localFilePath;
     }
 }

@@ -12,7 +12,6 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import netty.NettyConstant;
 import netty.codec.marshalling.decode.NettyMessageDecoder;
 import netty.codec.marshalling.encode.NettyMessageEncoder;
-import netty.frame.JProgressBarPanel;
 
 /**
  * @author wangchen
@@ -21,7 +20,7 @@ import netty.frame.JProgressBarPanel;
 public class NettyServer {
 
     public void run() throws Exception {
-        this.run(NettyConstant.REMOTE_IP, NettyConstant.LOCAL_PORT, new NioEventLoopGroup(), new NioEventLoopGroup(), new String[]{});
+        this.run(NettyConstant.REMOTE_IP, NettyConstant.LOCAL_NETTY_PORT, new NioEventLoopGroup(), new NioEventLoopGroup(), new String[]{});
     }
 
     public void run(String host, int port, NioEventLoopGroup bossGroup, NioEventLoopGroup workGroup, String[] whiteList) throws Exception {

@@ -18,15 +18,6 @@ import java.net.InetSocketAddress;
  * @date 2018/3/19 13:57
  */
 public class HttpFileUploadServer {
-
-    public static void main(String[] args) throws Exception {
-        int port = 8081;
-        if (args != null && args.length > 0) {
-            port = Integer.valueOf(args[0]);
-        }
-        new HttpFileUploadServer().run(port);
-    }
-
     public void run(int port) throws Exception {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
         NioEventLoopGroup workGroup = new NioEventLoopGroup();

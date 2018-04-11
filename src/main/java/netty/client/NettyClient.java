@@ -11,7 +11,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import netty.NettyConstant;
 import netty.codec.marshalling.decode.NettyMessageDecoder;
 import netty.codec.marshalling.encode.NettyMessageEncoder;
-import netty.frame.JProgressBarPanel;
+import frame.JProgressBarPanel;
 import netty.util.ObjectConvertUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class NettyClient {
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     public void connect(File file) throws Exception {
-        this.connect(NettyConstant.LOCAL_IP, NettyConstant.LOCAL_PORT, new File[]{file}, new NioEventLoopGroup(), new JProgressBarPanel());
+        this.connect(NettyConstant.LOCAL_IP, NettyConstant.LOCAL_NETTY_PORT, new File[]{file}, new NioEventLoopGroup(), new JProgressBarPanel());
     }
 
     public void connect(String host, int port, File[] files, NioEventLoopGroup workGroup, JProgressBarPanel panel) throws Exception {

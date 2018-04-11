@@ -1,12 +1,12 @@
-package netty.frame;
+package frame;
 
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.util.ResourceLeakDetector;
 import netty.NettyConstant;
 import netty.client.NettyClient;
 import netty.server.NettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.HttpFileUploadServer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -26,7 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class JProgressBarPanel extends JFrame {
 
-    Thread thread = null;
+    Thread threadNetty = null;
+    Thread threadWeb = null;
     JProgressBarPanel frame = null;
     NioEventLoopGroup bossGroup = null;
     NioEventLoopGroup workGroup = null;
@@ -49,7 +50,7 @@ public class JProgressBarPanel extends JFrame {
          * 面板
          */
         frame = new JProgressBarPanel();
-        frame.setSize(750, 500);
+        frame.setSize(750, 750);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new FlowLayout());
@@ -65,8 +66,11 @@ public class JProgressBarPanel extends JFrame {
                 if (workGroup != null) {
                     workGroup.shutdownGracefully();
                 }
-                if (thread != null) {
-                    thread.interrupt();
+                if (threadNetty != null) {
+                    threadNetty.interrupt();
+                }
+                if (threadWeb != null) {
+                    threadWeb.interrupt();
                 }
             }
         });
@@ -88,13 +92,19 @@ public class JProgressBarPanel extends JFrame {
                 transfer.setVisible(false);
 
                 JPanel panel = new JPanel();
-                panel.setLayout(new GridLayout(3,1,20,0));
+                panel.setLayout(new GridLayout(5,1,20,0));
                 frame.add(panel);
 
                 JTextField jTextField = null;
+                JTextField jTextFieldWeb = null;
+                JTextField localFilePath = null;
                 try {
-                    jTextField = new JTextField("监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_PORT );
+                    jTextField = new JTextField("Netty 监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_NETTY_PORT );
                     panel.add(jTextField);
+                    jTextFieldWeb = new JTextField("   Web监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_PORT);
+                    panel.add(jTextFieldWeb);
+                    localFilePath = new JTextField("   文件保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
+                    panel.add(localFilePath);
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 }
@@ -115,6 +125,14 @@ public class JProgressBarPanel extends JFrame {
                 jTextField.setBorder(new EmptyBorder(0,0,0,0));
                 jTextField.setBackground(new Color(238, 238, 238));
                 jTextField.setFont(new Font("宋体",Font.BOLD,20));
+
+                jTextFieldWeb.setBorder(new EmptyBorder(0,0,0,0));
+                jTextFieldWeb.setBackground(new Color(238, 238, 238));
+                jTextFieldWeb.setFont(new Font("宋体",Font.BOLD,20));
+
+                localFilePath.setBorder(new EmptyBorder(0,0,0,0));
+                localFilePath.setBackground(new Color(238, 238, 238));
+                localFilePath.setFont(new Font("宋体",Font.BOLD,20));
 
                 JButton run = new JButton("启动");
                 run.setFont(new Font("宋体",Font.BOLD,20));
@@ -147,19 +165,30 @@ public class JProgressBarPanel extends JFrame {
                         }
 
                         if (matches) {
-                            thread = new Thread(new Runnable() {
+                            threadNetty = new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     try {
                                         bossGroup = new NioEventLoopGroup();
                                         workGroup = new NioEventLoopGroup();
-                                        new NettyServer().run(InetAddress.getLocalHost().getHostAddress(), NettyConstant.LOCAL_PORT, bossGroup, workGroup, area.getText().split(","));
+                                        new NettyServer().run(InetAddress.getLocalHost().getHostAddress(), NettyConstant.LOCAL_NETTY_PORT, bossGroup, workGroup, area.getText().split(","));
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
                             });
-                            thread.start();
+                            threadNetty.start();
+                            threadWeb = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        new HttpFileUploadServer().run(NettyConstant.LOCAL_WEB_PORT);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            threadWeb.start();
                             run.setText("已启动！");
                             run.setEnabled(false);
                         } else {
@@ -187,7 +216,7 @@ public class JProgressBarPanel extends JFrame {
                  * 上传按钮
                  */
                 JButton developer = new JButton("上传文件");
-                JTextField field = new JTextField("输入,监听地址");
+                JTextField field = new JTextField("输入,Netty监听地址");
                 field.setSize(220, 20);
                 field.setFont(new Font("宋体",Font.BOLD,20));
 
@@ -231,12 +260,12 @@ public class JProgressBarPanel extends JFrame {
                                         workGroup = new NioEventLoopGroup();
                                         try {
 
-                                            if ("输入远程连接地址".equals(field.getText())) {
+                                            if ("输入Netty远程连接地址".equals(field.getText())) {
                                                 field.setText("");
                                             }
 
                                             String host = isEmpty(field.getText().split(":")[0]) ? NettyConstant.REMOTE_IP : field.getText().split(":")[0];
-                                            int port = isEmpty(field.getText().split(":")[1]) ? NettyConstant.LOCAL_PORT : Integer.parseInt(field.getText().split(":")[1]);
+                                            int port = isEmpty(field.getText().split(":")[1]) ? NettyConstant.LOCAL_NETTY_PORT : Integer.parseInt(field.getText().split(":")[1]);
 
                                             new NettyClient().connect(
                                                     host,

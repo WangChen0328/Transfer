@@ -2,9 +2,8 @@ package netty.client;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.ResourceLeakDetector;
 import netty.MessageType;
-import netty.frame.JProgressBarPanel;
+import frame.JProgressBarPanel;
 import netty.model.RequestFile;
 import netty.model.ResponseFile;
 import netty.pojo.NettyMessage;
