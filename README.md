@@ -17,6 +17,8 @@ JProgressBarPanel为启动类
 
 ![image](https://github.com/18920522006/Transfer/blob/master/src/main/resources/image/上传进度.png)
 
+---------------------------------------------------------------------------------------------------
+
 加入接收Web页面的传输功能，JS 传输使用 WebUploader发送
 
 以二进制形式发送数据。传输成功后，返回MD5加密的保存文件路径。
