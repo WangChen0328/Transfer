@@ -22,19 +22,19 @@ public class WebUploader {
     /**
      * 最后修改时间
      */
-    private Date lastModifiedDate;
+    private String lastModifiedDate;
     /**
      * 片段长度
      */
-    private long size;
+    private String size;
     /**
      * 总分片数
      */
-    private int chunks;
+    private String chunks;
     /**
      * 当前第几块
      */
-    private int chunk;
+    private String chunk;
 
     public String getId() {
         return id;
@@ -60,35 +60,35 @@ public class WebUploader {
         this.type = type;
     }
 
-    public Date getLastModifiedDate() {
+    public String getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Date lastModifiedDate) {
+    public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public long getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(long size) {
+    public void setSize(String size) {
         this.size = size;
     }
 
-    public int getChunks() {
+    public String getChunks() {
         return chunks;
     }
 
-    public void setChunks(int chunks) {
+    public void setChunks(String chunks) {
         this.chunks = chunks;
     }
 
-    public int getChunk() {
+    public String getChunk() {
         return chunk;
     }
 
-    public void setChunk(int chunk) {
+    public void setChunk(String chunk) {
         this.chunk = chunk;
     }
 }

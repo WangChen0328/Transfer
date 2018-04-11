@@ -1,12 +1,11 @@
 package web.util;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author wangchen
@@ -24,39 +23,43 @@ public class ReflectionUtil {
      * @param value
      *            修改后的新值
      */
-    public static void setFieldValue(Object obj, String name,Object value)
+    public static void setFieldValue(Object obj, String name,String value)
             throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ParseException {
-        Field field = obj.getClass().getDeclaredField(name);
+        if (getFields(obj.getClass()).containsKey(name)) {
 
-        field.setAccessible(true);
-        field.set(obj, formatValue(field, value));
+            Field field = obj.getClass().getDeclaredField(name);
+
+            field.setAccessible(true);
+            field.set(obj, value);
+        }
     }
 
     /**
-     * 根据字段属性，来转换值的类型
+     * 获取所有属性
      *
-     * @param field
-     *             字段
-     * @param value
-     *             值
+     * @param clazz
+     *             类
      * @return
      */
-    public static Object formatValue(Field field, Object value) throws ParseException {
+    public static Map<String, EntityClass> getFields(Class<?> clazz) {
+        Field[] fields = clazz.getDeclaredFields();
 
-        if (value instanceof java.lang.String) {
-            value = String.valueOf(value);
-        }
-        else if (value instanceof java.lang.Integer) {
-            value = Integer.parseInt(String.valueOf(value));
-        }
-        else if (value instanceof java.lang.Long) {
-            value = Long.parseLong(String.valueOf(value));
-        }
-        else if (value instanceof java.util.Date) {
-            new SimpleDateFormat().parse(String.valueOf(value));
+        Map<String, EntityClass> stringEntityClassMap = new HashMap();
+
+        for (Field field : fields) {
+            // 修饰符
+            String modifier = Modifier.toString(field.getModifiers());
+
+            // 数据类型
+            Class<?> type = field.getType();
+
+            // 属性名
+            String fieldName = field.getName();
+
+            stringEntityClassMap.put(fieldName, new EntityClass(modifier, type));
         }
 
-        return value;
+        return stringEntityClassMap;
     }
 
     /**
@@ -90,5 +93,37 @@ public class ReflectionUtil {
             throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         method.setAccessible(true);
         return method.invoke(obj, args);
+    }
+
+    private static class EntityClass {
+        /**
+         * 修饰符
+         */
+        String modifier;
+        /**
+         * 类型
+         */
+        Class<?> type;
+
+        public EntityClass(String modifier, Class<?> type) {
+            this.modifier = modifier;
+            this.type = type;
+        }
+
+        public String getModifier() {
+            return modifier;
+        }
+
+        public void setModifier(String modifier) {
+            this.modifier = modifier;
+        }
+
+        public Class<?> getType() {
+            return type;
+        }
+
+        public void setType(Class<?> type) {
+            this.type = type;
+        }
     }
 }

@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.*;
+import web.pojo.NettyMessage;
 import web.pojo.WebUploader;
 import web.util.HeaderUtil;
 import web.util.ReflectionUtil;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
 
-    Pattern pattern = Pattern.compile("Content-Disposition:form-data;name=\"([a-z]+?)\"(.+)");
+    Pattern pattern = Pattern.compile("Content-Disposition:form-data;name=\"([a-zA-Z]+?)\"(.+)");
 
     @Override
     protected void decode(ChannelHandlerContext ctx, FullHttpRequest request, List<Object> out) throws Exception {
@@ -62,7 +63,7 @@ public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
             content.readBytes(bytes);
             String[] attrs  = new String(bytes, "UTF-8").split("------" + regex);
             /**
-             * 文件
+             * 文件属性
              */
             WebUploader webUploader = new WebUploader();
             /**
@@ -78,13 +79,7 @@ public class HttpFileDecoder extends MessageToMessageDecoder<FullHttpRequest> {
             /**
              * call next
              */
-            out.add(webUploader);
+            out.add(new NettyMessage(webUploader, null));
         }
-    }
-    
-    public static void main(String[] args){
-        String str = "\\r\\nContent-Disposition: form-data; name=\"id\"\\r\\n\\r\\nWU_FILE_0\\r\\n------";
-        boolean matches = str.matches("\\r\\nContent-Disposition: form-data; name=\"id\"\\r\\n\\r\\nWU_FILE_0\\r\\n------");
-        System.out.println(matches);
     }
 }
