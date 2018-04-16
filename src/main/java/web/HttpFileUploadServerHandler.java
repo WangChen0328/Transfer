@@ -32,7 +32,7 @@ public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<Net
         WebUploader header = msg.getHeader();
         byte[] body = msg.getBody();
 
-        String localFilePath = mkdirs(header.getName());
+        String localFilePath = mkdirs(header.getId() + "_" + header.getName());
 
         randomAccessFile = new RandomAccessFile(new File(localFilePath), "rw");
         randomAccessFile.seek(header.getStart());
