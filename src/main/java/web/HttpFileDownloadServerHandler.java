@@ -1,11 +1,12 @@
 package web;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import web.util.Base64Util;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -22,7 +23,11 @@ import java.util.regex.Pattern;
  */
 public class HttpFileDownloadServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
+    private static final Logger log = LoggerFactory.getLogger(HttpFileDownloadServerHandler.class);
+
     private String url;
+
+    private int MAX_SIZE = 5000 * 1024;
 
     /**
      * 秘钥解密
@@ -135,7 +140,7 @@ public class HttpFileDownloadServerHandler extends SimpleChannelInboundHandler<F
                 /**
                  * 消息体 传输 大文件
                  */
-                new ChunkedFile(randomAccessFile, 0, fileLength, 8192), ctx.newProgressivePromise());
+                new ChunkedFile(randomAccessFile, 0, fileLength, MAX_SIZE), ctx.newProgressivePromise());
         /**
          * 监听 传输过程
          */
