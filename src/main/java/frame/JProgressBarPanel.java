@@ -6,6 +6,7 @@ import netty.client.NettyClient;
 import netty.server.NettyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.HttpFileDownloadServer;
 import web.HttpFileUploadServer;
 
 import javax.swing.*;
@@ -27,7 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JProgressBarPanel extends JFrame {
 
     Thread threadNetty = null;
-    Thread threadWeb = null;
+    Thread threadWebUpload = null;
+    Thread threadWebDownload = null;
     JProgressBarPanel frame = null;
     NioEventLoopGroup bossGroup = null;
     NioEventLoopGroup workGroup = null;
@@ -69,8 +71,11 @@ public class JProgressBarPanel extends JFrame {
                 if (threadNetty != null) {
                     threadNetty.interrupt();
                 }
-                if (threadWeb != null) {
-                    threadWeb.interrupt();
+                if (threadWebUpload != null) {
+                    threadWebUpload.interrupt();
+                }
+                if (threadWebDownload != null) {
+                    threadWebDownload.interrupt();
                 }
             }
         });
@@ -92,18 +97,21 @@ public class JProgressBarPanel extends JFrame {
                 transfer.setVisible(false);
 
                 JPanel panel = new JPanel();
-                panel.setLayout(new GridLayout(5,1,20,0));
+                panel.setLayout(new GridLayout(6,1,20,0));
                 frame.add(panel);
 
                 JTextField jTextField = null;
-                JTextField jTextFieldWeb = null;
+                JTextField jTextFieldWebUpLoad = null;
+                JTextField jTextFieldWebDownLoad = null;
                 JTextField localFilePath = null;
                 try {
-                    jTextField = new JTextField("Netty 监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_NETTY_PORT );
+                    jTextField = new JTextField(" Netty  监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_NETTY_PORT );
                     panel.add(jTextField);
-                    jTextFieldWeb = new JTextField("   Web监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_PORT);
-                    panel.add(jTextFieldWeb);
-                    localFilePath = new JTextField("   文件保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
+                    jTextFieldWebUpLoad = new JTextField(" Web监听上传地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_UPLOAD_PORT);
+                    panel.add(jTextFieldWebUpLoad);
+                    jTextFieldWebDownLoad = new JTextField(" Web监听下载地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_DOWNLOAD_PORT);
+                    panel.add(jTextFieldWebDownLoad);
+                    localFilePath = new JTextField(" 文件保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
                     panel.add(localFilePath);
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
@@ -126,9 +134,13 @@ public class JProgressBarPanel extends JFrame {
                 jTextField.setBackground(new Color(238, 238, 238));
                 jTextField.setFont(new Font("宋体",Font.BOLD,20));
 
-                jTextFieldWeb.setBorder(new EmptyBorder(0,0,0,0));
-                jTextFieldWeb.setBackground(new Color(238, 238, 238));
-                jTextFieldWeb.setFont(new Font("宋体",Font.BOLD,20));
+                jTextFieldWebUpLoad.setBorder(new EmptyBorder(0,0,0,0));
+                jTextFieldWebUpLoad.setBackground(new Color(238, 238, 238));
+                jTextFieldWebUpLoad.setFont(new Font("宋体",Font.BOLD,20));
+
+                jTextFieldWebDownLoad.setBorder(new EmptyBorder(0,0,0,0));
+                jTextFieldWebDownLoad.setBackground(new Color(238, 238, 238));
+                jTextFieldWebDownLoad.setFont(new Font("宋体",Font.BOLD,20));
 
                 localFilePath.setBorder(new EmptyBorder(0,0,0,0));
                 localFilePath.setBackground(new Color(238, 238, 238));
@@ -165,6 +177,9 @@ public class JProgressBarPanel extends JFrame {
                         }
 
                         if (matches) {
+                            /**
+                             * 接收Netty客户端
+                             */
                             threadNetty = new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -178,17 +193,34 @@ public class JProgressBarPanel extends JFrame {
                                 }
                             });
                             threadNetty.start();
-                            threadWeb = new Thread(new Runnable() {
+                            /**
+                             * 接收Web上传
+                             */
+                            threadWebUpload = new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     try {
-                                        new HttpFileUploadServer().run(NettyConstant.LOCAL_WEB_PORT);
+                                        new HttpFileUploadServer().run(NettyConstant.LOCAL_WEB_UPLOAD_PORT);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
                             });
-                            threadWeb.start();
+                            threadWebUpload.start();
+                            /**
+                             * 接收Web下载
+                             */
+                            threadWebDownload = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        new HttpFileDownloadServer().run(NettyConstant.LOCAL_WEB_DOWNLOAD_PORT);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            threadWebDownload.start();
                             run.setText("已启动！");
                             run.setEnabled(false);
                         } else {

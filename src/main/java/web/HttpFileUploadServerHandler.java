@@ -10,6 +10,7 @@ import io.netty.util.CharsetUtil;
 import netty.util.MD5FileUtil;
 import web.pojo.NettyMessage;
 import web.pojo.WebUploader;
+import web.util.Base64Util;
 import web.util.HeaderUtil;
 
 import java.io.File;
@@ -23,6 +24,8 @@ import java.util.Date;
  */
 public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<NettyMessage> {
 
+    private String SecretKey = "6950810f0d2bba97a6f710c7b965b84e";
+
     private String localPath = System.getProperty("user.home") + File.separator + "FileServer" + File.separator + "Web";
 
     RandomAccessFile randomAccessFile;
@@ -32,7 +35,7 @@ public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<Net
         WebUploader header = msg.getHeader();
         byte[] body = msg.getBody();
 
-        String localFilePath = mkdirs(header.getId() + "_" + header.getName());
+        String localFilePath = mkdirs(header.getId() + "_$_" + header.getName());
 
         randomAccessFile = new RandomAccessFile(new File(localFilePath), "rw");
         randomAccessFile.seek(header.getStart());
@@ -41,7 +44,7 @@ public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<Net
 
         DefaultFullHttpResponse response =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
-                        Unpooled.copiedBuffer(MD5FileUtil.getMD5String(localFilePath), CharsetUtil.UTF_8));
+                        Unpooled.copiedBuffer(new Base64Util(SecretKey, "utf-8").encode(localFilePath), CharsetUtil.UTF_8));
         HeaderUtil.setHeader(response);
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }

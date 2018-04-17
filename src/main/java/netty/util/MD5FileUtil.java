@@ -16,27 +16,15 @@ public class MD5FileUtil {
     private static final Logger logger = LoggerFactory.getLogger(MD5FileUtil.class);
 
     protected static char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6',  '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-    protected static MessageDigest messagedigest = null;
-
-    /**
-     * MessageDigest初始化
-     */
-    static {
-        try {
-            messagedigest = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            System.err.println("MD5FileUtil messagedigest初始化失败");
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 对文件进行MD5加密
      */
-    public static String getMD5String(File file) throws IOException {
+    public static String getMD5String(File file) throws IOException, NoSuchAlgorithmException {
         FileInputStream in = new FileInputStream(file);
         FileChannel ch = in.getChannel();
         MappedByteBuffer byteBuffer = ch.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
+        MessageDigest messagedigest = MessageDigest.getInstance("MD5");
         messagedigest.update(byteBuffer);
         return bufferToHex(messagedigest.digest());
     }
@@ -44,14 +32,15 @@ public class MD5FileUtil {
     /**
      * 对字符串进行MD5加密
      */
-    public static String getMD5String(String s) {
+    public static String getMD5String(String s) throws NoSuchAlgorithmException {
         return getMD5String(s.getBytes());
     }
 
     /**
      * 对byte类型的数组进行MD5加密
      */
-    public static String getMD5String(byte[] bytes) {
+    public static String getMD5String(byte[] bytes) throws NoSuchAlgorithmException {
+        MessageDigest messagedigest = MessageDigest.getInstance("MD5");
         messagedigest.update(bytes);
         return bufferToHex(messagedigest.digest());
     }
@@ -70,5 +59,10 @@ public class MD5FileUtil {
             stringbuffer.append(c1);
         }
         return stringbuffer.toString();
+    }
+
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        String transfer = MD5FileUtil.getMD5String("Transfer");
+        System.out.println(transfer);
     }
 }
