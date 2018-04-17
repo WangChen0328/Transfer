@@ -55,7 +55,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>netty.frame.JProgressBarPanel</mainClass>
+                            <mainClass>frame.JProgressBarPanel</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
