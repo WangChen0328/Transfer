@@ -61,9 +61,15 @@ public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<Net
             }
         }
 
-        Base64Util base64Util = new Base64Util(SecretKey, "utf-8");
-        String returnPath = "";
+        Base64Util base64Util = null;
+        try {
+            base64Util = new Base64Util(SecretKey, "utf-8");
+        } catch (Exception e) {
+            log.error("创建BASE64 错误 [" + e.getMessage() + "] !");
+            e.printStackTrace();
+        }
 
+        String returnPath = "";
         try {
             returnPath = base64Util.encode(localFilePath);
         } catch (Exception e) {
