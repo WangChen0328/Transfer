@@ -142,6 +142,11 @@ public class HttpFileDownloadServerHandler extends SimpleChannelInboundHandler<F
                  */
                 new ChunkedFile(randomAccessFile, 0, fileLength, MAX_SIZE), ctx.newProgressivePromise());
         /**
+         * 关闭读取流
+         */
+        randomAccessFile.close();
+        /**
+         *
          * 监听 传输过程
          */
         future.addListener(new ChannelProgressiveFutureListener() {
@@ -238,5 +243,11 @@ public class HttpFileDownloadServerHandler extends SimpleChannelInboundHandler<F
         //      http://192.168.31.228:8080          /              src/test/java/com/netty/netty/
         //return System.getProperty("user.dir") + File.separator + uri;
         return uri;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
     }
 }
