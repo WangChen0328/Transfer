@@ -142,10 +142,6 @@ public class HttpFileDownloadServerHandler extends SimpleChannelInboundHandler<F
                  */
                 new ChunkedFile(randomAccessFile, 0, fileLength, MAX_SIZE), ctx.newProgressivePromise());
         /**
-         * 关闭读取流
-         */
-        randomAccessFile.close();
-        /**
          *
          * 监听 传输过程
          */
@@ -175,6 +171,10 @@ public class HttpFileDownloadServerHandler extends SimpleChannelInboundHandler<F
          *  SocketChannel中发送给客户端
          */
         ChannelFuture lastfuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        /**
+         * 关闭读取流
+         */
+        randomAccessFile.close();
         /**
          * 如果客户端发来的请求不是  keep-alive
          */
