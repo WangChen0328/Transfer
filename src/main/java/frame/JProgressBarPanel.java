@@ -133,7 +133,7 @@ public class JProgressBarPanel extends JFrame {
                         if (chooser.showOpenDialog(filePath) == JFileChooser.APPROVE_OPTION) {
                             File selectedFile = chooser.getSelectedFile();
                             savePath[0] = selectedFile.getPath();
-                            localFilePath.setText("文件保存地址：" + selectedFile.getPath()  + File.separator + " : ...");
+                            localFilePath.setText("文件保存地址：" + selectedFile.getPath()  + File.separator + " FileServer " + File.separator + ": ...");
                             frame.invalidate();
                             frame.repaint();
                         }
