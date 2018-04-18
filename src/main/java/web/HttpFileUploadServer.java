@@ -18,7 +18,7 @@ import java.net.InetSocketAddress;
  * @date 2018/3/19 13:57
  */
 public class HttpFileUploadServer {
-    public void run(int port) throws Exception {
+    public void run(int port, String savePath) throws Exception {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
         NioEventLoopGroup workGroup = new NioEventLoopGroup();
         try {
@@ -33,7 +33,7 @@ public class HttpFileUploadServer {
                                     .addLast(new HttpServerCodec())
                                     .addLast(new HttpObjectAggregator( 10000 * 1024))
                                     .addLast(new HttpFileDecoder())
-                                    .addLast(new HttpFileUploadServerHandler());
+                                    .addLast(new HttpFileUploadServerHandler(savePath));
                         }
                     });
             ChannelFuture future = b.bind(new InetSocketAddress(port)).sync();

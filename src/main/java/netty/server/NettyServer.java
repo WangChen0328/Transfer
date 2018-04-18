@@ -20,10 +20,10 @@ import netty.codec.marshalling.encode.NettyMessageEncoder;
 public class NettyServer {
 
     public void run() throws Exception {
-        this.run(NettyConstant.REMOTE_IP, NettyConstant.LOCAL_NETTY_PORT, new NioEventLoopGroup(), new NioEventLoopGroup(), new String[]{});
+        this.run(NettyConstant.REMOTE_IP, NettyConstant.LOCAL_NETTY_PORT, new NioEventLoopGroup(), new NioEventLoopGroup(), new String[]{}, null);
     }
 
-    public void run(String host, int port, NioEventLoopGroup bossGroup, NioEventLoopGroup workGroup, String[] whiteList) throws Exception {
+    public void run(String host, int port, NioEventLoopGroup bossGroup, NioEventLoopGroup workGroup, String[] whiteList, String savePath) throws Exception {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workGroup)
@@ -60,7 +60,7 @@ public class NettyServer {
                                     /**
                                      * 文件接收
                                      */
-                                    .addLast("fileTransfer", new FileUploadRepsHandler());
+                                    .addLast("fileTransfer", new FileUploadRepsHandler(savePath));
                         }
                     });
             ChannelFuture future = b.bind(host, port).sync();

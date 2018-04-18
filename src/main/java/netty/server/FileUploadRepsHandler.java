@@ -12,6 +12,7 @@ import netty.util.MD5FileUtil;
 import netty.util.NettyMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.util.StringUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,8 +41,11 @@ public class FileUploadRepsHandler extends SimpleChannelInboundHandler<NettyMess
 
     private Map<String, RandomAccessFile> randomAccessFiles;
 
-    public FileUploadRepsHandler() {
+    public FileUploadRepsHandler(String localPath) {
         this.randomAccessFiles = new ConcurrentHashMap<>();
+        if (localPath != null && localPath.length() > 0) {
+            this.localPath = localPath + File.separator + "FileServer" + File.separator + "Netty";
+        }
     }
 
     @Override

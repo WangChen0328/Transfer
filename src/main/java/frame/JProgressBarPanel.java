@@ -52,7 +52,7 @@ public class JProgressBarPanel extends JFrame {
          * 面板
          */
         frame = new JProgressBarPanel();
-        frame.setSize(750, 750);
+        frame.setSize(750, 850);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new FlowLayout());
@@ -86,6 +86,7 @@ public class JProgressBarPanel extends JFrame {
         JButton transfer = new JButton("发送文件");
 
         Container contentPane = frame.getContentPane();
+
         /**
          * 接收文件
          */
@@ -97,25 +98,47 @@ public class JProgressBarPanel extends JFrame {
                 transfer.setVisible(false);
 
                 JPanel panel = new JPanel();
-                panel.setLayout(new GridLayout(6,1,20,0));
+                final String[] savePath = {""};
+                panel.setLayout(new GridLayout(7,1,20,0));
                 frame.add(panel);
 
                 JTextField jTextField = null;
                 JTextField jTextFieldWebUpLoad = null;
                 JTextField jTextFieldWebDownLoad = null;
-                JTextField localFilePath = null;
+                JTextField localFilePath = new JTextField("默认1保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
+                JButton filePath = new JButton(" 选择文件保存地址");
+
                 try {
-                    jTextField = new JTextField(" Netty  监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_NETTY_PORT );
+                    jTextField = new JTextField("Netty  监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_NETTY_PORT );
                     panel.add(jTextField);
-                    jTextFieldWebUpLoad = new JTextField(" Web监听上传地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_UPLOAD_PORT);
+                    jTextFieldWebUpLoad = new JTextField("Web监听上传地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_UPLOAD_PORT);
                     panel.add(jTextFieldWebUpLoad);
-                    jTextFieldWebDownLoad = new JTextField(" Web监听下载地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_DOWNLOAD_PORT);
+                    jTextFieldWebDownLoad = new JTextField("Web监听下载地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_WEB_DOWNLOAD_PORT);
                     panel.add(jTextFieldWebDownLoad);
-                    localFilePath = new JTextField(" 文件保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
+                    panel.add(filePath);
                     panel.add(localFilePath);
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 }
+
+                filePath.addActionListener(new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JFileChooser chooser = new JFileChooser();
+                        chooser.setMultiSelectionEnabled(false);
+                        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                        /**
+                         * 只选文件夹
+                         */
+                        if (chooser.showOpenDialog(filePath) == JFileChooser.APPROVE_OPTION) {
+                            File selectedFile = chooser.getSelectedFile();
+                            savePath[0] = selectedFile.getPath();
+                            localFilePath.setText("文件保存地址：" + selectedFile.getPath()  + File.separator + " : ...");
+                            frame.invalidate();
+                            frame.repaint();
+                        }
+                    }
+                });
 
                 /**
                  * 白名单地址
@@ -186,7 +209,7 @@ public class JProgressBarPanel extends JFrame {
                                     try {
                                         bossGroup = new NioEventLoopGroup();
                                         workGroup = new NioEventLoopGroup();
-                                        new NettyServer().run(InetAddress.getLocalHost().getHostAddress(), NettyConstant.LOCAL_NETTY_PORT, bossGroup, workGroup, area.getText().split(","));
+                                        new NettyServer().run(InetAddress.getLocalHost().getHostAddress(), NettyConstant.LOCAL_NETTY_PORT, bossGroup, workGroup, area.getText().split(","), savePath[0]);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -200,7 +223,7 @@ public class JProgressBarPanel extends JFrame {
                                 @Override
                                 public void run() {
                                     try {
-                                        new HttpFileUploadServer().run(NettyConstant.LOCAL_WEB_UPLOAD_PORT);
+                                        new HttpFileUploadServer().run(NettyConstant.LOCAL_WEB_UPLOAD_PORT, savePath[0]);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -221,8 +244,9 @@ public class JProgressBarPanel extends JFrame {
                                 }
                             });
                             threadWebDownload.start();
-                            run.setText("已启动！");
                             run.setEnabled(false);
+                            filePath.setEnabled(false);
+                            run.setText("已启动！");
                         } else {
                             run.setVisible(true);
                             area.setText("ip地址格式不合法！");

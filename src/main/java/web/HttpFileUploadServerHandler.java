@@ -35,6 +35,12 @@ public class HttpFileUploadServerHandler extends SimpleChannelInboundHandler<Net
 
     RandomAccessFile randomAccessFile;
 
+    public HttpFileUploadServerHandler(String localPath) {
+        if (localPath != null && localPath.length() > 0) {
+            this.localPath = localPath + File.separator + "FileServer" + File.separator + "Web";
+        }
+    }
+
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, NettyMessage msg) {
         WebUploader header = msg.getHeader();
