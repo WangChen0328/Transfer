@@ -30,7 +30,14 @@ public class FileUploadReqHandler extends SimpleChannelInboundHandler<NettyMessa
 
     private JProgressBarPanel panel;
 
-    private int MAX_SIZE = 5000 * 1024;
+    /**
+     * 由于当前发送的默认为 一问一答 模式并没有展现出并发的优势
+     * 在网络不稳定或者很慢的情况下，只能采用最小的发送方式
+     * 如果文件过大，导致不能及时应答，服务端或客户端 心跳连验证失败
+     * Netty 部分代码 将重写
+     * Web 部分不受影响
+     */
+    private int MAX_SIZE = 8 * 1024;
 
     private Map<String, RequestFile> requests;
 
