@@ -106,7 +106,7 @@ public class JProgressBarPanel extends JFrame {
                 JTextField jTextFieldWebUpLoad = null;
                 JTextField jTextFieldWebDownLoad = null;
                 JTextField localFilePath = new JTextField("默认保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
-                JButton filePath = new JButton(" 选择文件保存地址");
+                JButton filePath = new JButton("选择文件保存地址");
 
                 try {
                     jTextField = new JTextField("Netty  监听地址：" + InetAddress.getLocalHost().getHostAddress() + ":" + NettyConstant.LOCAL_NETTY_PORT );
