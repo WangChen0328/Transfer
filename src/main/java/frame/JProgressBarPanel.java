@@ -105,7 +105,7 @@ public class JProgressBarPanel extends JFrame {
                 JTextField jTextField = null;
                 JTextField jTextFieldWebUpLoad = null;
                 JTextField jTextFieldWebDownLoad = null;
-                JTextField localFilePath = new JTextField("默认1保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
+                JTextField localFilePath = new JTextField("默认保存地址：" + System.getProperty("user.home") + File.separator + "FileServer" + File.separator + ": ...");
                 JButton filePath = new JButton(" 选择文件保存地址");
 
                 try {
